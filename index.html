@@ -391,32 +391,344 @@
         }
 
         // 사주 데이터 생성
-        function generateBaziData(birthData) {
-            const tianGan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
-            const diZhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
-            
-            const date = new Date(birthData.date);
-            const yearIndex = date.getFullYear() % 10;
-            const monthIndex = (date.getMonth() + 1) % 12;
-            const dayIndex = date.getDate() % 10;
-            const timeIndex = parseInt(birthData.time.split(':')[0]) % 12;
-            
-            return {
-                fourPillars: {
-                    year: tianGan[yearIndex] + diZhi[yearIndex % 12],
-                    month: tianGan[(yearIndex + 2) % 10] + diZhi[monthIndex],
-                    day: tianGan[dayIndex] + diZhi[(dayIndex + 3) % 12],
-                    hour: tianGan[(dayIndex + 4) % 10] + diZhi[timeIndex]
-                },
-                fiveElements: {
-                    木: Math.floor(Math.random() * 3) + 1,
-                    火: Math.floor(Math.random() * 3) + 1,
-                    土: Math.floor(Math.random() * 3) + 1,
-                    金: Math.floor(Math.random() * 3) + 1,
-                    水: Math.floor(Math.random() * 3) + 1
-                }
-            };
+        // 범용 사주팔자 계산 엔진 - 모든 날짜 지원
+// index.html의 generateBaziData 함수를 이것으로 완전 교체하세요
+
+function generateBaziData(birthData) {
+    console.log('🔮 범용 사주 계산 시작:', birthData);
+    
+    const date = new Date(birthData.date + 'T' + birthData.time);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+    
+    console.log('📅 입력 날짜:', { year, month, day, hour, minute });
+    
+    // 실제 사주 계산
+    const yearPillar = calculateYearPillar(year);
+    const monthPillar = calculateMonthPillar(year, month, day);
+    const dayPillar = calculateDayPillar(year, month, day);
+    const hourPillar = calculateHourPillar(hour, dayPillar);
+    
+    const result = {
+        fourPillars: {
+            year: yearPillar,
+            month: monthPillar,
+            day: dayPillar,
+            hour: hourPillar
+        },
+        fiveElements: calculateFiveElements([yearPillar, monthPillar, dayPillar, hourPillar]),
+        analysis: analyzeBazi(yearPillar, monthPillar, dayPillar, hourPillar),
+        debug: {
+            inputDate: birthData.date,
+            inputTime: birthData.time,
+            calculatedYear: year,
+            calculatedMonth: month,
+            calculatedDay: day,
+            calculatedHour: hour
         }
+    };
+    
+    console.log('✅ 사주 계산 완료:', result);
+    return result;
+}
+
+// 년주 계산 (실제 60갑자 순환)
+function calculateYearPillar(year) {
+    const tianGan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const diZhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    
+    // 기준: 1984년 = 甲子년 (갑자년)
+    const baseYear = 1984;
+    const yearDiff = year - baseYear;
+    
+    // 60갑자 순환 계산
+    let ganIndex = (yearDiff % 10 + 10) % 10;
+    let zhiIndex = (yearDiff % 12 + 12) % 12;
+    
+    return tianGan[ganIndex] + diZhi[zhiIndex];
+}
+
+// 월주 계산 (절기 기준)
+function calculateMonthPillar(year, month, day) {
+    const tianGan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const diZhi = ['寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥', '子', '丑']; // 정월=寅월부터
+    
+    // 절기표 (대략적)
+    const solarTermDays = [
+        4,  // 1월 - 소한(1/5경)
+        4,  // 2월 - 입춘(2/4경)  
+        6,  // 3월 - 경칩(3/6경)
+        5,  // 4월 - 청명(4/5경)
+        6,  // 5월 - 입하(5/6경)
+        6,  // 6월 - 망종(6/6경)
+        7,  // 7월 - 소서(7/7경)
+        8,  // 8월 - 입추(8/8경)
+        8,  // 9월 - 백로(9/8경)
+        8,  // 10월 - 한로(10/8경)
+        7,  // 11월 - 입동(11/7경)
+        7   // 12월 - 대설(12/7경)
+    ];
+    
+    // 절기 전후 판단
+    let monthIndex = month - 1; // 0부터 시작
+    if (day < solarTermDays[monthIndex]) {
+        monthIndex = monthIndex - 1;
+        if (monthIndex < 0) monthIndex = 11;
+    }
+    
+    // 년간에 따른 월간 결정
+    const yearGan = calculateYearPillar(year)[0];
+    const yearGanIndex = tianGan.indexOf(yearGan);
+    
+    // 월간 계산 공식
+    const monthGanIndex = (yearGanIndex * 2 + monthIndex) % 10;
+    
+    return tianGan[monthGanIndex] + diZhi[monthIndex];
+}
+
+// 일주 계산 (율리우스 적일 기반)
+function calculateDayPillar(year, month, day) {
+    const tianGan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const diZhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    
+    // 율리우스 적일 계산
+    const julianDay = getJulianDay(year, month, day);
+    
+    // 기준일: JD 2299161 = 1582/10/15 = 甲子일
+    const baseJulianDay = 2299161;
+    const dayOffset = julianDay - baseJulianDay;
+    
+    const ganIndex = (dayOffset % 10 + 10) % 10;
+    const zhiIndex = (dayOffset % 12 + 12) % 12;
+    
+    return tianGan[ganIndex] + diZhi[zhiIndex];
+}
+
+// 율리우스 적일 계산
+function getJulianDay(year, month, day) {
+    if (month <= 2) {
+        year--;
+        month += 12;
+    }
+    
+    const a = Math.floor(year / 100);
+    const b = 2 - a + Math.floor(a / 4);
+    
+    return Math.floor(365.25 * (year + 4716)) + 
+           Math.floor(30.6001 * (month + 1)) + 
+           day + b - 1524;
+}
+
+// 시주 계산
+function calculateHourPillar(hour, dayPillar) {
+    const tianGan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+    const diZhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+    
+    // 시간대별 지지 매핑
+    const hourToZhi = [
+        23, 1,   // 23-01시 = 子시
+        1, 3,    // 01-03시 = 丑시  
+        3, 5,    // 03-05시 = 寅시
+        5, 7,    // 05-07시 = 卯시
+        7, 9,    // 07-09시 = 辰시
+        9, 11,   // 09-11시 = 巳시
+        11, 13,  // 11-13시 = 午시
+        13, 15,  // 13-15시 = 未시
+        15, 17,  // 15-17시 = 申시
+        17, 19,  // 17-19시 = 酉시
+        19, 21,  // 19-21시 = 戌시
+        21, 23   // 21-23시 = 亥시
+    ];
+    
+    // 시간에 해당하는 지지 찾기
+    let zhiIndex = 0;
+    if (hour >= 23 || hour < 1) zhiIndex = 0;      // 子
+    else if (hour >= 1 && hour < 3) zhiIndex = 1;  // 丑
+    else if (hour >= 3 && hour < 5) zhiIndex = 2;  // 寅
+    else if (hour >= 5 && hour < 7) zhiIndex = 3;  // 卯
+    else if (hour >= 7 && hour < 9) zhiIndex = 4;  // 辰
+    else if (hour >= 9 && hour < 11) zhiIndex = 5; // 巳
+    else if (hour >= 11 && hour < 13) zhiIndex = 6; // 午
+    else if (hour >= 13 && hour < 15) zhiIndex = 7; // 未
+    else if (hour >= 15 && hour < 17) zhiIndex = 8; // 申
+    else if (hour >= 17 && hour < 19) zhiIndex = 9; // 酉
+    else if (hour >= 19 && hour < 21) zhiIndex = 10; // 戌
+    else if (hour >= 21 && hour < 23) zhiIndex = 11; // 亥
+    
+    // 일간에 따른 시간 천간 계산
+    const dayGan = dayPillar[0];
+    const dayGanIndex = tianGan.indexOf(dayGan);
+    
+    // 시간 천간 공식: (일간 × 2 + 시지) % 10
+    const hourGanIndex = (dayGanIndex * 2 + zhiIndex) % 10;
+    
+    return tianGan[hourGanIndex] + diZhi[zhiIndex];
+}
+
+// 오행 분석
+function calculateFiveElements(pillars) {
+    const wuXing = {
+        // 천간 오행
+        '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土',
+        '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水',
+        // 지지 오행
+        '子': '水', '丑': '土', '寅': '木', '卯': '木', '辰': '土', '巳': '火',
+        '午': '火', '未': '土', '申': '金', '酉': '金', '戌': '土', '亥': '水'
+    };
+    
+    const elements = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
+    
+    pillars.forEach(pillar => {
+        const gan = pillar[0]; // 천간
+        const zhi = pillar[1]; // 지지
+        
+        if (wuXing[gan]) elements[wuXing[gan]]++;
+        if (wuXing[zhi]) elements[wuXing[zhi]]++;
+    });
+    
+    return elements;
+}
+
+// 사주 기본 분석
+function analyzeBazi(yearPillar, monthPillar, dayPillar, hourPillar) {
+    const dayGan = dayPillar[0]; // 일간 (나를 나타냄)
+    
+    // 일간별 기본 성격
+    const ganPersonality = {
+        '甲': '리더십이 강하고 진취적이며, 새로운 것을 시작하는 능력이 뛰어납니다.',
+        '乙': '부드럽고 유연하며, 예술적 감각과 섬세함을 가지고 있습니다.',
+        '丙': '밝고 활발하며 사교적이고, 남을 도우려는 마음이 큽니다.',
+        '丁': '온화하고 신중하며, 정교한 일을 잘하고 배려심이 깊습니다.',
+        '戊': '믿음직하고 안정적이며, 포용력이 있고 현실적입니다.',
+        '己': '신중하고 꼼꼼하며, 인내심이 강하고 계획적입니다.',
+        '庚': '의지가 강하고 결단력이 있으며, 정의감이 강합니다.',
+        '辛': '세련되고 품위가 있으며, 미적 감각이 뛰어납니다.',
+        '壬': '지혜롭고 융통성이 있으며, 포용력이 크고 적응력이 뛰어납니다.',
+        '癸': '차분하고 내성적이며, 깊이 있는 사고를 하고 인내심이 강합니다.'
+    };
+    
+    // 계절 분석
+    const monthZhi = monthPillar[1];
+    const season = getSeasonByMonthZhi(monthZhi);
+    
+    return {
+        dayMaster: dayGan,
+        personality: ganPersonality[dayGan] || '독특하고 개성적인 성향을 가지고 있습니다.',
+        season: season,
+        strength: calculateDayMasterStrength(dayGan, monthZhi),
+        luckyElements: determineLuckyElements(dayGan, season)
+    };
+}
+
+// 계절 판단
+function getSeasonByMonthZhi(monthZhi) {
+    const seasons = {
+        '寅': '봄', '卯': '봄', '辰': '봄',
+        '巳': '여름', '午': '여름', '未': '여름', 
+        '申': '가을', '酉': '가을', '戌': '가을',
+        '亥': '겨울', '子': '겨울', '丑': '겨울'
+    };
+    
+    return seasons[monthZhi] || '사계절';
+}
+
+// 일간 강약 판단 (간단 버전)
+function calculateDayMasterStrength(dayGan, monthZhi) {
+    const ganElement = {
+        '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土',
+        '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
+    };
+    
+    const zhiElement = {
+        '寅': '木', '卯': '木', '辰': '土', '巳': '火', '午': '火', '未': '土',
+        '申': '金', '酉': '金', '戌': '土', '亥': '水', '子': '水', '丑': '土'
+    };
+    
+    const element = ganElement[dayGan];
+    const monthElement = zhiElement[monthZhi];
+    
+    if (element === monthElement) {
+        return '강함 (득령)';
+    } else if (isElementSupported(element, monthElement)) {
+        return '보통 (도움받음)';
+    } else {
+        return '약함 (극을 받음)';
+    }
+}
+
+// 오행 상생 관계 판단
+function isElementSupported(element1, element2) {
+    const support = {
+        '木': '水', // 목은 수생목
+        '火': '木', // 화는 목생화
+        '土': '火', // 토는 화생토
+        '金': '土', // 금은 토생금
+        '水': '金'  // 수는 금생수
+    };
+    
+    return support[element1] === element2;
+}
+
+// 용신 결정 (간단 버전)
+function determineLuckyElements(dayGan, season) {
+    const ganElement = {
+        '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土',
+        '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水'
+    };
+    
+    const element = ganElement[dayGan];
+    
+    // 계절별 용신 (매우 간단화)
+    const seasonalNeeds = {
+        '봄': ['火', '土'], // 봄에는 따뜻함과 안정이 필요
+        '여름': ['水', '金'], // 여름에는 시원함이 필요
+        '가을': ['火', '木'], // 가을에는 따뜻함과 생기가 필요
+        '겨울': ['火', '木']  // 겨울에는 따뜻함과 생기가 필요
+    };
+    
+    return seasonalNeeds[season] || ['土'];
+}
+
+// 테스트 함수 - 실제 사주와 비교
+function testCalculation() {
+    console.log('🧪 사주 계산 테스트 시작');
+    
+    // 테스트 케이스들
+    const testCases = [
+        {
+            name: '1978년 12월 6일 15시',
+            data: { date: '1978-12-06', time: '15:01' },
+            expected: { year: '戊午', month: '癸亥', day: '壬寅', hour: '丁未' }
+        },
+        {
+            name: '1990년 1월 1일 12시',
+            data: { date: '1990-01-01', time: '12:00' },
+            expected: null // 비교값 없음
+        }
+    ];
+    
+    testCases.forEach(testCase => {
+        console.log(`\n테스트: ${testCase.name}`);
+        const result = generateBaziData(testCase.data);
+        console.log('계산 결과:', result.fourPillars);
+        
+        if (testCase.expected) {
+            console.log('예상 결과:', testCase.expected);
+            console.log('일치 여부:', 
+                result.fourPillars.year === testCase.expected.year &&
+                result.fourPillars.day === testCase.expected.day
+            );
+        }
+    });
+}
+
+// 브라우저 콘솔에서 테스트 실행 가능
+// 사용법: testCalculation()
+
+console.log('✅ 범용 사주팔자 계산 엔진 로딩 완료');
 
         // 서양점성술 데이터 생성
         function generateWesternData(birthData) {

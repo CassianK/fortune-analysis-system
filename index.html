@@ -18,29 +18,270 @@
         <main>
             <section id="input-form">
                 <h2>출생 정보 입력</h2>
-                <form id="birth-form">
-                    <div class="form-group">
-                        <label for="birth-date">출생일:</label>
-                        <input type="date" id="birth-date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="birth-time">출생시간:</label>
-                        <input type="time" id="birth-time" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="birth-location">출생지:</label>
-                        <input type="text" id="birth-location" placeholder="예: 서울특별시" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="gender">성별:</label>
-                        <select id="gender" required>
-                            <option value="">선택하세요</option>
-                            <option value="male">남성</option>
-                            <option value="female">여성</option>
-                        </select>
-                    </div>
-                    <button type="submit">🔍 분석 시작</button>
-                </form>
+                <!-- index.html의 form 부분을 이것으로 교체하세요 -->
+
+<section id="input-form">
+    <h2>출생 정보 입력</h2>
+    <form id="birth-form">
+        <!-- 년도 입력 -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="birth-year">출생년도:</label>
+                <input type="number" id="birth-year" min="1900" max="2024" placeholder="1978" required>
+            </div>
+            <div class="form-group">
+                <label for="birth-month">월:</label>
+                <select id="birth-month" required>
+                    <option value="">선택</option>
+                    <option value="01">1월</option>
+                    <option value="02">2월</option>
+                    <option value="03">3월</option>
+                    <option value="04">4월</option>
+                    <option value="05">5월</option>
+                    <option value="06">6월</option>
+                    <option value="07">7월</option>
+                    <option value="08">8월</option>
+                    <option value="09">9월</option>
+                    <option value="10">10월</option>
+                    <option value="11">11월</option>
+                    <option value="12">12월</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="birth-day">일:</label>
+                <select id="birth-day" required>
+                    <option value="">선택</option>
+                    <!-- JavaScript로 동적 생성 -->
+                </select>
+            </div>
+        </div>
+
+        <!-- 시간 입력 -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="birth-hour">시간:</label>
+                <select id="birth-hour" required>
+                    <option value="">선택</option>
+                    <!-- 0시부터 23시까지 -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="birth-minute">분:</label>
+                <select id="birth-minute" required>
+                    <option value="">선택</option>
+                    <!-- 0분부터 59분까지 -->
+                </select>
+            </div>
+        </div>
+
+        <!-- 기존 입력들 -->
+        <div class="form-group">
+            <label for="birth-location">출생지:</label>
+            <input type="text" id="birth-location" placeholder="예: 서울특별시, 창원시" required>
+            <small>시/도 또는 시/군/구 단위로 입력해주세요</small>
+        </div>
+
+        <div class="form-group">
+            <label for="gender">성별:</label>
+            <div class="gender-buttons">
+                <button type="button" class="gender-btn" data-value="male">👨 남성</button>
+                <button type="button" class="gender-btn" data-value="female">👩 여성</button>
+            </div>
+            <input type="hidden" id="gender" required>
+        </div>
+
+        <button type="submit">🔍 분석 시작</button>
+    </form>
+</section>
+
+<style>
+/* 새로운 스타일 추가 */
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.gender-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.gender-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.gender-btn:hover {
+    border-color: #667eea;
+}
+
+.gender-btn.active {
+    border-color: #667eea;
+    background: #667eea;
+    color: white;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #718096;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-row .form-group {
+        margin-bottom: 20px;
+    }
+}
+</style>
+
+<script>
+// 개선된 폼 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    initializeImprovedForm();
+});
+
+function initializeImprovedForm() {
+    // 일 옵션 생성
+    const daySelect = document.getElementById('birth-day');
+    for (let i = 1; i <= 31; i++) {
+        const option = document.createElement('option');
+        option.value = i.toString().padStart(2, '0');
+        option.textContent = i + '일';
+        daySelect.appendChild(option);
+    }
+
+    // 시간 옵션 생성
+    const hourSelect = document.getElementById('birth-hour');
+    for (let i = 0; i < 24; i++) {
+        const option = document.createElement('option');
+        option.value = i.toString().padStart(2, '0');
+        option.textContent = i + '시';
+        hourSelect.appendChild(option);
+    }
+
+    // 분 옵션 생성
+    const minuteSelect = document.getElementById('birth-minute');
+    for (let i = 0; i < 60; i++) {
+        const option = document.createElement('option');
+        option.value = i.toString().padStart(2, '0');
+        option.textContent = i + '분';
+        minuteSelect.appendChild(option);
+    }
+
+    // 성별 버튼 이벤트
+    document.querySelectorAll('.gender-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // 모든 버튼 비활성화
+            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+            // 클릭된 버튼 활성화
+            this.classList.add('active');
+            // 숨겨진 input에 값 설정
+            document.getElementById('gender').value = this.dataset.value;
+        });
+    });
+
+    // 월 변경 시 일 옵션 업데이트
+    document.getElementById('birth-month').addEventListener('change', updateDayOptions);
+    document.getElementById('birth-year').addEventListener('change', updateDayOptions);
+}
+
+function updateDayOptions() {
+    const year = parseInt(document.getElementById('birth-year').value);
+    const month = parseInt(document.getElementById('birth-month').value);
+    const daySelect = document.getElementById('birth-day');
+    
+    if (!year || !month) return;
+    
+    // 해당 월의 마지막 날 계산
+    const lastDay = new Date(year, month, 0).getDate();
+    
+    // 기존 옵션 제거
+    daySelect.innerHTML = '<option value="">선택</option>';
+    
+    // 새 옵션 추가
+    for (let i = 1; i <= lastDay; i++) {
+        const option = document.createElement('option');
+        option.value = i.toString().padStart(2, '0');
+        option.textContent = i + '일';
+        daySelect.appendChild(option);
+    }
+}
+
+// 기존 handleFormSubmit 함수 수정
+async function handleFormSubmit(event) {
+    event.preventDefault();
+    
+    // 개선된 입력값 수집
+    const year = document.getElementById('birth-year').value;
+    const month = document.getElementById('birth-month').value;
+    const day = document.getElementById('birth-day').value;
+    const hour = document.getElementById('birth-hour').value;
+    const minute = document.getElementById('birth-minute').value;
+    
+    const birthData = {
+        date: `${year}-${month}-${day}`,
+        time: `${hour}:${minute}`,
+        location: document.getElementById('birth-location').value,
+        gender: document.getElementById('gender').value
+    };
+    
+    // 유효성 검사
+    if (!validateInputs(birthData)) {
+        alert('모든 정보를 정확히 입력해주세요.');
+        return;
+    }
+    
+    // 분석 시작
+    showLoadingScreen();
+    
+    try {
+        await performAnalysis(birthData);
+        showResults();
+    } catch (error) {
+        console.error('분석 중 오류 발생:', error);
+        alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+        hideLoadingScreen();
+    }
+}
+
+// 개선된 유효성 검사
+function validateInputs(data) {
+    if (!data.date || data.date === '--') {
+        alert('출생년월일을 모두 선택해주세요.');
+        return false;
+    }
+    if (!data.time || data.time === ':') {
+        alert('출생시간을 모두 선택해주세요.');
+        return false;
+    }
+    if (!data.location.trim()) {
+        alert('출생지를 입력해주세요.');
+        return false;
+    }
+    if (!data.gender) {
+        alert('성별을 선택해주세요.');
+        return false;
+    }
+    return true;
+}
+</script>
             </section>
             
             <section id="results" style="display: none;">

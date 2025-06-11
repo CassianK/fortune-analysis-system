@@ -184,3 +184,58 @@ button:hover:before {
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
 }
+/* 오행 차트 스타일 */
+.elements-chart {
+    margin: 20px 0;
+}
+
+.element-item {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+}
+
+.element-name {
+    width: 40px;
+    font-weight: bold;
+    color: #2d3748;
+}
+
+.element-count {
+    width: 50px;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.element-bar {
+    height: 20px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 10px;
+    margin-left: 10px;
+    min-width: 20px;
+}
+
+/* 버튼 그룹 */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.primary-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.secondary-btn {
+    background: #718096;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+    }
+}

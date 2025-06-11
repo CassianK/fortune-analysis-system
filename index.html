@@ -5,9 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>종합 운명학 분석 시스템</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    
+    <style>
+        /* 폼 스타일 추가 */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .gender-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .gender-btn:hover {
+            border-color: #667eea;
+        }
+
+        .gender-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #718096;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .form-row .form-group {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
 </head>
-<script src="assets/js/bazi-calculator.js"></script>
-<script src="assets/js/main.js"></script>
 <body>
     <div class="container">
         <header>
@@ -18,270 +73,76 @@
         <main>
             <section id="input-form">
                 <h2>출생 정보 입력</h2>
-                <!-- index.html의 form 부분을 이것으로 교체하세요 -->
+                <form id="birth-form">
+                    <!-- 년도 입력 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="birth-year">출생년도:</label>
+                            <input type="number" id="birth-year" min="1900" max="2024" placeholder="1978" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="birth-month">월:</label>
+                            <select id="birth-month" required>
+                                <option value="">선택</option>
+                                <option value="01">1월</option>
+                                <option value="02">2월</option>
+                                <option value="03">3월</option>
+                                <option value="04">4월</option>
+                                <option value="05">5월</option>
+                                <option value="06">6월</option>
+                                <option value="07">7월</option>
+                                <option value="08">8월</option>
+                                <option value="09">9월</option>
+                                <option value="10">10월</option>
+                                <option value="11">11월</option>
+                                <option value="12">12월</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="birth-day">일:</label>
+                            <select id="birth-day" required>
+                                <option value="">선택</option>
+                                <!-- JavaScript로 동적 생성 -->
+                            </select>
+                        </div>
+                    </div>
 
-<section id="input-form">
-    <h2>출생 정보 입력</h2>
-    <form id="birth-form">
-        <!-- 년도 입력 -->
-        <div class="form-row">
-            <div class="form-group">
-                <label for="birth-year">출생년도:</label>
-                <input type="number" id="birth-year" min="1900" max="2024" placeholder="1978" required>
-            </div>
-            <div class="form-group">
-                <label for="birth-month">월:</label>
-                <select id="birth-month" required>
-                    <option value="">선택</option>
-                    <option value="01">1월</option>
-                    <option value="02">2월</option>
-                    <option value="03">3월</option>
-                    <option value="04">4월</option>
-                    <option value="05">5월</option>
-                    <option value="06">6월</option>
-                    <option value="07">7월</option>
-                    <option value="08">8월</option>
-                    <option value="09">9월</option>
-                    <option value="10">10월</option>
-                    <option value="11">11월</option>
-                    <option value="12">12월</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="birth-day">일:</label>
-                <select id="birth-day" required>
-                    <option value="">선택</option>
-                    <!-- JavaScript로 동적 생성 -->
-                </select>
-            </div>
-        </div>
+                    <!-- 시간 입력 -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="birth-hour">시간:</label>
+                            <select id="birth-hour" required>
+                                <option value="">선택</option>
+                                <!-- 0시부터 23시까지 -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="birth-minute">분:</label>
+                            <select id="birth-minute" required>
+                                <option value="">선택</option>
+                                <!-- 0분부터 59분까지 -->
+                            </select>
+                        </div>
+                    </div>
 
-        <!-- 시간 입력 -->
-        <div class="form-row">
-            <div class="form-group">
-                <label for="birth-hour">시간:</label>
-                <select id="birth-hour" required>
-                    <option value="">선택</option>
-                    <!-- 0시부터 23시까지 -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="birth-minute">분:</label>
-                <select id="birth-minute" required>
-                    <option value="">선택</option>
-                    <!-- 0분부터 59분까지 -->
-                </select>
-            </div>
-        </div>
+                    <!-- 기존 입력들 -->
+                    <div class="form-group">
+                        <label for="birth-location">출생지:</label>
+                        <input type="text" id="birth-location" placeholder="예: 서울특별시, 창원시" required>
+                        <small>시/도 또는 시/군/구 단위로 입력해주세요</small>
+                    </div>
 
-        <!-- 기존 입력들 -->
-        <div class="form-group">
-            <label for="birth-location">출생지:</label>
-            <input type="text" id="birth-location" placeholder="예: 서울특별시, 창원시" required>
-            <small>시/도 또는 시/군/구 단위로 입력해주세요</small>
-        </div>
+                    <div class="form-group">
+                        <label for="gender">성별:</label>
+                        <div class="gender-buttons">
+                            <button type="button" class="gender-btn" data-value="male">👨 남성</button>
+                            <button type="button" class="gender-btn" data-value="female">👩 여성</button>
+                        </div>
+                        <input type="hidden" id="gender" required>
+                    </div>
 
-        <div class="form-group">
-            <label for="gender">성별:</label>
-            <div class="gender-buttons">
-                <button type="button" class="gender-btn" data-value="male">👨 남성</button>
-                <button type="button" class="gender-btn" data-value="female">👩 여성</button>
-            </div>
-            <input type="hidden" id="gender" required>
-        </div>
-
-        <button type="submit">🔍 분석 시작</button>
-    </form>
-</section>
-
-<style>
-/* 새로운 스타일 추가 */
-.form-row {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.form-row .form-group {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-.gender-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.gender-btn {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
-    background: white;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.gender-btn:hover {
-    border-color: #667eea;
-}
-
-.gender-btn.active {
-    border-color: #667eea;
-    background: #667eea;
-    color: white;
-}
-
-.form-group small {
-    display: block;
-    margin-top: 5px;
-    color: #718096;
-    font-size: 0.8rem;
-}
-
-@media (max-width: 768px) {
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
-    
-    .form-row .form-group {
-        margin-bottom: 20px;
-    }
-}
-</style>
-
-<script>
-// 개선된 폼 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    initializeImprovedForm();
-});
-
-function initializeImprovedForm() {
-    // 일 옵션 생성
-    const daySelect = document.getElementById('birth-day');
-    for (let i = 1; i <= 31; i++) {
-        const option = document.createElement('option');
-        option.value = i.toString().padStart(2, '0');
-        option.textContent = i + '일';
-        daySelect.appendChild(option);
-    }
-
-    // 시간 옵션 생성
-    const hourSelect = document.getElementById('birth-hour');
-    for (let i = 0; i < 24; i++) {
-        const option = document.createElement('option');
-        option.value = i.toString().padStart(2, '0');
-        option.textContent = i + '시';
-        hourSelect.appendChild(option);
-    }
-
-    // 분 옵션 생성
-    const minuteSelect = document.getElementById('birth-minute');
-    for (let i = 0; i < 60; i++) {
-        const option = document.createElement('option');
-        option.value = i.toString().padStart(2, '0');
-        option.textContent = i + '분';
-        minuteSelect.appendChild(option);
-    }
-
-    // 성별 버튼 이벤트
-    document.querySelectorAll('.gender-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // 모든 버튼 비활성화
-            document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
-            // 클릭된 버튼 활성화
-            this.classList.add('active');
-            // 숨겨진 input에 값 설정
-            document.getElementById('gender').value = this.dataset.value;
-        });
-    });
-
-    // 월 변경 시 일 옵션 업데이트
-    document.getElementById('birth-month').addEventListener('change', updateDayOptions);
-    document.getElementById('birth-year').addEventListener('change', updateDayOptions);
-}
-
-function updateDayOptions() {
-    const year = parseInt(document.getElementById('birth-year').value);
-    const month = parseInt(document.getElementById('birth-month').value);
-    const daySelect = document.getElementById('birth-day');
-    
-    if (!year || !month) return;
-    
-    // 해당 월의 마지막 날 계산
-    const lastDay = new Date(year, month, 0).getDate();
-    
-    // 기존 옵션 제거
-    daySelect.innerHTML = '<option value="">선택</option>';
-    
-    // 새 옵션 추가
-    for (let i = 1; i <= lastDay; i++) {
-        const option = document.createElement('option');
-        option.value = i.toString().padStart(2, '0');
-        option.textContent = i + '일';
-        daySelect.appendChild(option);
-    }
-}
-
-// 기존 handleFormSubmit 함수 수정
-async function handleFormSubmit(event) {
-    event.preventDefault();
-    
-    // 개선된 입력값 수집
-    const year = document.getElementById('birth-year').value;
-    const month = document.getElementById('birth-month').value;
-    const day = document.getElementById('birth-day').value;
-    const hour = document.getElementById('birth-hour').value;
-    const minute = document.getElementById('birth-minute').value;
-    
-    const birthData = {
-        date: `${year}-${month}-${day}`,
-        time: `${hour}:${minute}`,
-        location: document.getElementById('birth-location').value,
-        gender: document.getElementById('gender').value
-    };
-    
-    // 유효성 검사
-    if (!validateInputs(birthData)) {
-        alert('모든 정보를 정확히 입력해주세요.');
-        return;
-    }
-    
-    // 분석 시작
-    showLoadingScreen();
-    
-    try {
-        await performAnalysis(birthData);
-        showResults();
-    } catch (error) {
-        console.error('분석 중 오류 발생:', error);
-        alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
-        hideLoadingScreen();
-    }
-}
-
-// 개선된 유효성 검사
-function validateInputs(data) {
-    if (!data.date || data.date === '--') {
-        alert('출생년월일을 모두 선택해주세요.');
-        return false;
-    }
-    if (!data.time || data.time === ':') {
-        alert('출생시간을 모두 선택해주세요.');
-        return false;
-    }
-    if (!data.location.trim()) {
-        alert('출생지를 입력해주세요.');
-        return false;
-    }
-    if (!data.gender) {
-        alert('성별을 선택해주세요.');
-        return false;
-    }
-    return true;
-}
-</script>
+                    <button type="submit">🔍 분석 시작</button>
+                </form>
             </section>
             
             <section id="results" style="display: none;">
@@ -294,6 +155,412 @@ function validateInputs(data) {
         </main>
     </div>
     
-    <script src="assets/js/main.js"></script>
+    <!-- JavaScript 파일들 - 중요: 순서와 경로 확인 -->
+    <script>
+        // 인라인으로 기본 초기화 코드 추가
+        console.log('🔮 운명학 시스템 인라인 로딩 시작');
+        
+        // 전역 변수
+        let analysisData = {};
+
+        // DOM 로드 완료 시 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM 로딩 완료');
+            initializeApp();
+        });
+
+        // 앱 초기화
+        function initializeApp() {
+            console.log('🚀 앱 초기화 시작');
+            
+            // 폼 요소 찾기
+            const form = document.getElementById('birth-form');
+            if (form) {
+                console.log('✅ 폼 찾음');
+                form.addEventListener('submit', handleFormSubmit);
+                console.log('✅ 폼 이벤트 연결됨');
+            } else {
+                console.error('❌ 폼을 찾을 수 없음');
+            }
+            
+            // 기본 폼 설정
+            setupForm();
+        }
+
+        // 폼 설정
+        function setupForm() {
+            console.log('📝 폼 설정 시작');
+            
+            // 일 옵션 생성
+            const daySelect = document.getElementById('birth-day');
+            if (daySelect) {
+                for (let i = 1; i <= 31; i++) {
+                    const option = document.createElement('option');
+                    option.value = i.toString().padStart(2, '0');
+                    option.textContent = i + '일';
+                    daySelect.appendChild(option);
+                }
+                console.log('✅ 일 옵션 생성 완료');
+            }
+
+            // 시간 옵션 생성
+            const hourSelect = document.getElementById('birth-hour');
+            if (hourSelect) {
+                for (let i = 0; i < 24; i++) {
+                    const option = document.createElement('option');
+                    option.value = i.toString().padStart(2, '0');
+                    option.textContent = i + '시';
+                    hourSelect.appendChild(option);
+                }
+                console.log('✅ 시간 옵션 생성 완료');
+            }
+
+            // 분 옵션 생성
+            const minuteSelect = document.getElementById('birth-minute');
+            if (minuteSelect) {
+                for (let i = 0; i < 60; i++) {
+                    const option = document.createElement('option');
+                    option.value = i.toString().padStart(2, '0');
+                    option.textContent = i + '분';
+                    minuteSelect.appendChild(option);
+                }
+                console.log('✅ 분 옵션 생성 완료');
+            }
+
+            // 성별 버튼 이벤트
+            document.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 모든 버튼 비활성화
+                    document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+                    
+                    // 클릭된 버튼 활성화
+                    this.classList.add('active');
+                    
+                    // 숨겨진 input에 값 설정
+                    const genderInput = document.getElementById('gender');
+                    if (genderInput) {
+                        genderInput.value = this.dataset.value;
+                        console.log('✅ 성별 선택:', this.dataset.value);
+                    }
+                });
+            });
+        }
+
+        // 폼 제출 처리
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            console.log('🚀 폼 제출 시작');
+            
+            try {
+                // 입력값 수집
+                const year = document.getElementById('birth-year').value;
+                const month = document.getElementById('birth-month').value;
+                const day = document.getElementById('birth-day').value;
+                const hour = document.getElementById('birth-hour').value;
+                const minute = document.getElementById('birth-minute').value;
+                const location = document.getElementById('birth-location').value;
+                const gender = document.getElementById('gender').value;
+                
+                console.log('📋 입력값:', { year, month, day, hour, minute, location, gender });
+                
+                const birthData = {
+                    date: `${year}-${month}-${day}`,
+                    time: `${hour}:${minute}`,
+                    location: location,
+                    gender: gender
+                };
+                
+                // 유효성 검사
+                if (!validateInputs(birthData)) {
+                    return;
+                }
+                
+                console.log('✅ 유효성 검사 통과');
+                
+                // 분석 시작
+                showLoadingScreen();
+                await performAnalysis(birthData);
+                showResults();
+                
+            } catch (error) {
+                console.error('❌ 분석 중 오류 발생:', error);
+                alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+                hideLoadingScreen();
+            }
+        }
+
+        // 유효성 검사
+        function validateInputs(data) {
+            console.log('🔍 유효성 검사:', data);
+            
+            if (!data.date || data.date.includes('null') || data.date === '--') {
+                alert('출생년월일을 모두 선택해주세요.');
+                return false;
+            }
+            
+            if (!data.time || data.time.includes('null') || data.time === ':') {
+                alert('출생시간을 모두 선택해주세요.');
+                return false;
+            }
+            
+            if (!data.location || !data.location.trim()) {
+                alert('출생지를 입력해주세요.');
+                return false;
+            }
+            
+            if (!data.gender) {
+                alert('성별을 선택해주세요.');
+                return false;
+            }
+            
+            return true;
+        }
+
+        // 로딩 화면 표시
+        function showLoadingScreen() {
+            console.log('⏳ 로딩 화면 표시');
+            document.getElementById('input-form').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analysis-results').style.display = 'none';
+        }
+
+        // 로딩 화면 숨김
+        function hideLoadingScreen() {
+            console.log('🔄 로딩 화면 숨김');
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('input-form').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+        }
+
+        // 결과 표시
+        function showResults() {
+            console.log('📊 결과 표시');
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('analysis-results').style.display = 'block';
+            
+            const resultsDiv = document.getElementById('analysis-results');
+            resultsDiv.innerHTML = generateResultsHTML();
+        }
+
+        // 분석 수행
+        async function performAnalysis(birthData) {
+            console.log('🔮 분석 시작');
+            
+            updateLoadingMessage('천문학적 계산 중...');
+            await delay(1000);
+            
+            updateLoadingMessage('사주팔자 분석 중...');
+            await delay(1000);
+            
+            // 사주 계산
+            const baziResult = generateBaziData(birthData);
+            
+            updateLoadingMessage('서양점성술 분석 중...');
+            await delay(1000);
+            
+            const westernResult = generateWesternData(birthData);
+            
+            updateLoadingMessage('종합 해석 생성 중...');
+            await delay(1000);
+            
+            analysisData = {
+                birthInfo: birthData,
+                bazi: baziResult,
+                western: westernResult,
+                summary: generateSummary(baziResult, birthData)
+            };
+            
+            console.log('✅ 분석 완료:', analysisData);
+        }
+
+        // 로딩 메시지 업데이트
+        function updateLoadingMessage(message) {
+            const loadingText = document.querySelector('#loading p');
+            if (loadingText) {
+                loadingText.textContent = message;
+                console.log('📢', message);
+            }
+        }
+
+        // 지연 함수
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 사주 데이터 생성
+        function generateBaziData(birthData) {
+            const tianGan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+            const diZhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+            
+            const date = new Date(birthData.date);
+            const yearIndex = date.getFullYear() % 10;
+            const monthIndex = (date.getMonth() + 1) % 12;
+            const dayIndex = date.getDate() % 10;
+            const timeIndex = parseInt(birthData.time.split(':')[0]) % 12;
+            
+            return {
+                fourPillars: {
+                    year: tianGan[yearIndex] + diZhi[yearIndex % 12],
+                    month: tianGan[(yearIndex + 2) % 10] + diZhi[monthIndex],
+                    day: tianGan[dayIndex] + diZhi[(dayIndex + 3) % 12],
+                    hour: tianGan[(dayIndex + 4) % 10] + diZhi[timeIndex]
+                },
+                fiveElements: {
+                    木: Math.floor(Math.random() * 3) + 1,
+                    火: Math.floor(Math.random() * 3) + 1,
+                    土: Math.floor(Math.random() * 3) + 1,
+                    金: Math.floor(Math.random() * 3) + 1,
+                    水: Math.floor(Math.random() * 3) + 1
+                }
+            };
+        }
+
+        // 서양점성술 데이터 생성
+        function generateWesternData(birthData) {
+            const date = new Date(birthData.date);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            
+            let sunSign = '양자리';
+            if (month === 12 && day >= 22 || month === 1 && day <= 19) sunSign = '염소자리';
+            else if (month === 1 && day >= 20 || month === 2 && day <= 18) sunSign = '물병자리';
+            else if (month === 2 && day >= 19 || month === 3 && day <= 20) sunSign = '물고기자리';
+            else if (month === 3 && day >= 21 || month === 4 && day <= 19) sunSign = '양자리';
+            else if (month === 4 && day >= 20 || month === 5 && day <= 20) sunSign = '황소자리';
+            else if (month === 5 && day >= 21 || month === 6 && day <= 20) sunSign = '쌍둥이자리';
+            else if (month === 6 && day >= 21 || month === 7 && day <= 22) sunSign = '게자리';
+            else if (month === 7 && day >= 23 || month === 8 && day <= 22) sunSign = '사자자리';
+            else if (month === 8 && day >= 23 || month === 9 && day <= 22) sunSign = '처녀자리';
+            else if (month === 9 && day >= 23 || month === 10 && day <= 22) sunSign = '천칭자리';
+            else if (month === 10 && day >= 23 || month === 11 && day <= 21) sunSign = '전갈자리';
+            else if (month === 11 && day >= 22 || month === 12 && day <= 21) sunSign = '사수자리';
+            
+            const signs = ['양자리', '황소자리', '쌍둥이자리', '게자리', '사자자리', '처녀자리', 
+                           '천칭자리', '전갈자리', '사수자리', '염소자리', '물병자리', '물고기자리'];
+            
+            return {
+                sunSign: sunSign,
+                moonSign: signs[Math.floor(Math.random() * 12)],
+                ascendant: signs[Math.floor(Math.random() * 12)]
+            };
+        }
+
+        // 종합 요약 생성
+        function generateSummary(baziResult, birthData) {
+            return {
+                personality: '창의적이고 직관적인 성향을 가지고 있으며, 감정이 풍부하고 예술적 감각이 뛰어납니다.',
+                strengths: [
+                    '뛰어난 직감력과 통찰력',
+                    '창의적 사고와 예술적 감각',
+                    '깊은 공감능력과 이해심'
+                ],
+                challenges: [
+                    '때로는 완벽주의 성향',
+                    '감정의 기복 관리 필요',
+                    '결정 내리기를 어려워함'
+                ],
+                advice: '내면의 목소리에 귀 기울이고, 명상이나 요가를 통해 마음의 평정을 찾으세요. 창작 활동을 통해 감정을 표현하는 것이 도움이 될 것입니다.'
+            };
+        }
+
+        // 결과 HTML 생성
+        function generateResultsHTML() {
+            const bazi = analysisData.bazi;
+            const western = analysisData.western;
+            const summary = analysisData.summary;
+            
+            return `
+                <h2>🌟 종합 운명 분석 결과</h2>
+                
+                <div class="result-section">
+                    <h3>📊 사주팔자</h3>
+                    <div class="bazi-chart">
+                        <div class="pillar">
+                            <div class="pillar-label">년주</div>
+                            <div class="pillar-value">${bazi.fourPillars.year}</div>
+                        </div>
+                        <div class="pillar">
+                            <div class="pillar-label">월주</div>
+                            <div class="pillar-value">${bazi.fourPillars.month}</div>
+                        </div>
+                        <div class="pillar">
+                            <div class="pillar-label">일주</div>
+                            <div class="pillar-value">${bazi.fourPillars.day}</div>
+                        </div>
+                        <div class="pillar">
+                            <div class="pillar-label">시주</div>
+                            <div class="pillar-value">${bazi.fourPillars.hour}</div>
+                        </div>
+                    </div>
+                    
+                    <h4>🌊 오행 분포</h4>
+                    <div class="elements-chart">
+                        ${Object.entries(bazi.fiveElements).map(([element, count]) => 
+                            `<div class="element-item">
+                                <span class="element-name">${element}</span>
+                                <span class="element-count">${count}개</span>
+                                <div class="element-bar" style="width: ${count * 20}%; height: 20px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 10px; margin-left: 10px;"></div>
+                            </div>`
+                        ).join('')}
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <h3>🌟 서양점성술</h3>
+                    <p><strong>태양:</strong> ${western.sunSign}</p>
+                    <p><strong>달:</strong> ${western.moonSign}</p>
+                    <p><strong>상승:</strong> ${western.ascendant}</p>
+                </div>
+                
+                <div class="result-section">
+                    <h3>💎 종합 분석</h3>
+                    <h4>성격 특성</h4>
+                    <p>${summary.personality}</p>
+                    
+                    <h4>강점</h4>
+                    <ul>
+                        ${summary.strengths.map(strength => `<li>${strength}</li>`).join('')}
+                    </ul>
+                    
+                    <h4>도전 과제</h4>
+                    <ul>
+                        ${summary.challenges.map(challenge => `<li>${challenge}</li>`).join('')}
+                    </ul>
+                    
+                    <h4>💡 인생 조언</h4>
+                    <p>${summary.advice}</p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="startNewAnalysis()" style="background: #718096; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; margin-right: 10px;">
+                        🔄 새로 분석하기
+                    </button>
+                    <button onclick="alert('PDF 기능은 곧 추가됩니다!')" style="background: #38a169; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer;">
+                        📄 PDF 저장
+                    </button>
+                </div>
+            `;
+        }
+
+        // 새 분석 시작
+        function startNewAnalysis() {
+            console.log('🔄 새 분석 시작');
+            
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('input-form').style.display = 'block';
+            document.getElementById('birth-form').reset();
+            
+            // 성별 버튼 초기화
+            document.querySelectorAll('.gender-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('gender').value = '';
+        }
+
+        console.log('✅ 인라인 스크립트 로딩 완료');
+    </script>
 </body>
 </html>
